@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * Worst Practice Aws S3 Adapter Test
+ *
+ * PHP version 8.0
+ *
+ * @copyright 2021 Worst Practice
+ * @license   https://opensource.org/licenses/MIT The MIT License (MIT)
+ *
+ * @link http://www.worstpractice.dev
+ */
+
+declare(strict_types=1);
+
 namespace WorstPracticeTest\Component\Aws\S3;
 
 use Aws\S3\S3Client;
