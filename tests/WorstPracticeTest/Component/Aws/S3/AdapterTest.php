@@ -196,6 +196,15 @@ class AdapterTest extends PHPUnitTestCase
                     ['Key' => 'one-result/data6.txt', 'LastModified' => '2020-03-05 18:00:00'],
                     ['Key' => 'one-result/data5.txt', 'LastModified' => '2020-03-04 11:00:00'],
                 ],
+            ],
+            'testAllResultWithLimitOnly' => [
+                'prefix' => 'paged-results',
+                'sortBy' => null,
+                'limit' => 2,
+                'expectedResult' => [
+                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
+                    ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00'],
+                ],
             ]
         ];
     }
@@ -223,6 +232,31 @@ class AdapterTest extends PHPUnitTestCase
     }
 
     /**
+     * Tests the getLastUploadedKeyByPrefix() method
+     */
+    public function testGetLastUploadedKeyByPrefix(): void
+    {
+        $s3Adapter = new S3Adapter($this->getS3Client());
+        $s3Adapter->setBucket('test-bucket');
+
+        $expectedResult = 'one-result/data8.txt';
+        $actualResult = $s3Adapter->getLastUploadedKeyByPrefix('paged-results');
+        self::assertSame($expectedResult, $actualResult);
+    }
+
+    /**
+     * Tests the getLastUploadedKeyByPrefix() method for a non-existing path
+     */
+    public function testGetLastUploadedKeyByPrefixForEmptyFolder(): void
+    {
+        $s3Adapter = new S3Adapter($this->getS3Client());
+        $s3Adapter->setBucket('test-bucket');
+
+        $actualResult = $s3Adapter->getLastUploadedKeyByPrefix('some/path');
+        self::assertNull($actualResult);
+    }
+
+    /**
      * Creates a mocked S3 Client instance.
      *
      * @return S3Client|MockObject
@@ -241,7 +275,20 @@ class AdapterTest extends PHPUnitTestCase
                 $prefix = $options['Prefix'];
                 $next = $options['ContinuationToken'] ?? '';
 
-                return $s3Bucket[$prefix][$next] ?? $s3Bucket['no-result'][''];
+                $result = $s3Bucket[$prefix][$next] ?? $s3Bucket['no-result'][''];
+
+                $awsLimiter = $options['MaxKeys'] ?? 0;
+
+                if (!empty($result)
+                    && !empty($awsLimiter)
+                    && $awsLimiter < count($result['Contents'])
+                ) {
+                    $chunkedResults = array_chunk($result['Contents'], $awsLimiter)[0];
+                    $result['Contents'] = $chunkedResults;
+                    $result['IsTruncated'] = false;
+                }
+
+                return $result;
             });
 
         return $s3Client;

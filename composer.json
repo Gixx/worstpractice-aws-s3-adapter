@@ -61,7 +61,7 @@
     "md": "vendor/bin/phpmd src/ text phpmd.xml",
     "cs-fixer": "vendor/bin/php-cs-fixer fix src/",
     "cs": "vendor/bin/phpcs --standard=PSR12 src/",
-    "unit": "vendor/bin/phpunit -c phpunit.xml --testdox --colors=always",
+    "unit": "vendor/bin/phpunit -dxdebug.mode=coverage -c phpunit.xml --testdox --colors=always",
     "phpstan": "vendor/bin/phpstan analyse src --level=7"
   }
 }
