@@ -35,7 +35,7 @@ before_commands:
 
 build:
   nodes:
-    php74:
+    php80:
       environment:
         php: '8.0'
 
@@ -50,7 +50,7 @@ build:
           -
             command: composer run unit
             coverage:
-              file: 'build/clover.xml'
+              file: 'build/coverage.xml'
               format: 'clover'
 
 tools:

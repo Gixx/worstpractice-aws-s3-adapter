@@ -17,7 +17,7 @@
       <directory suffix=".php">src</directory>
     </include>
     <report>
-      <clover outputFile="build/clover.xml"/>
+      <clover outputFile="build/coverage.xml"/>
       <html outputDirectory="build/coverage"/>
     </report>
   </coverage>
