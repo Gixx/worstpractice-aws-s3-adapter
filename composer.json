@@ -1,7 +1,7 @@
 {
   "name": "gixx/worstpractice-aws-s3-adapter",
   "type": "library",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple adapter for the AWS S3 Client",
   "homepage": "http://www.worstpractice.dev",
   "minimum-stability": "stable",
