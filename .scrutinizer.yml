@@ -37,7 +37,10 @@ build:
   nodes:
     php80:
       environment:
-        php: '8.0'
+        php:
+          version: '8.0'
+          ini:
+            'xdebug.mode': 'coverage'
 
       tests:
         override:
