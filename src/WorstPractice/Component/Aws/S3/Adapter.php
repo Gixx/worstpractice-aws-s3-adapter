@@ -77,8 +77,6 @@ class Adapter implements AdapterInterface
      */
     public function getObjectListByPrefix(string $keyPrefix, string $sortBy = null, int $limit = 0): array
     {
-        $results = [];
-        $continuationToken = '';
         $options = [
             'Bucket' => $this->bucket,
             'EncodingType' => 'url',
@@ -95,10 +93,26 @@ class Adapter implements AdapterInterface
             $limit = 0;
         }
 
+        $results = $this->fetchFullFileList($options);
+        $this->sortFileList($results, $sortBy);
+        $this->limitFileList($results, $limit);
+
+        return $results;
+    }
+
+    /**
+     * Fetches full file list.
+     *
+     * @param array $options
+     * @return array
+     */
+    protected function fetchFullFileList(array $options): array
+    {
+        $results = [];
+        $continuationToken = '';
+
         do {
-            if (!empty($continuationToken)) {
-                $options['ContinuationToken'] = $continuationToken;
-            }
+            $options['ContinuationToken'] = $continuationToken;
 
             $response = $this->s3Client->listObjectsV2($options);
 
@@ -112,22 +126,42 @@ class Adapter implements AdapterInterface
             usleep(50000); // 50 ms pause to avoid CPU spikes
         } while ($isTruncated);
 
-        $results = array_merge([], ...$results);
+        return array_merge([], ...$results);
+    }
 
-        if (!empty($sortBy) && in_array($sortBy, $this->validSortByKeys, true)) {
-            $direction = $sortBy[0] === '^' ? 'asc' : 'desc';
-            $sortByKey = substr($sortBy, 1);
-
-            usort($results, static function ($a, $b) use ($direction, $sortByKey) {
-                $cmp = strcmp($a[$sortByKey], $b[$sortByKey]);
-                return $direction === 'asc' ? $cmp : -$cmp;
-            });
+    /**
+     * Sorts file list by name or date, ascending or descending.
+     *
+     * @param array $fileList
+     * @param string|null $sortBy
+     */
+    protected function sortFileList(array &$fileList, ?string $sortBy): void
+    {
+        if (empty($sortBy) || !in_array($sortBy, $this->validSortByKeys, true)) {
+            return;
         }
 
-        if (!empty($results) && $limit > 0) {
-            $results = array_chunk($results, $limit)[0];
+        $direction = $sortBy[0] === '^' ? 'asc' : 'desc';
+        $sortByKey = substr($sortBy, 1);
+
+        usort($fileList, static function ($a, $b) use ($direction, $sortByKey) {
+            $cmp = strcmp($a[$sortByKey], $b[$sortByKey]);
+            return $direction === 'asc' ? $cmp : -$cmp;
+        });
+    }
+
+    /**
+     * Limit the file list at most the given number of items.
+     *
+     * @param array $fileList
+     * @param int $limit
+     */
+    protected function limitFileList(array &$fileList, int $limit): void
+    {
+        if (empty($fileList) || $limit <= 0) {
+            return;
         }
 
-        return $results;
+        $fileList = array_chunk($fileList, $limit)[0];
     }
 }
