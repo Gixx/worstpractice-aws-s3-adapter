@@ -1,0 +1,19 @@
+includes:
+    - 'vendor/symplify/phpstan-extensions/config/config.neon'
+    - 'vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon'
+    - 'vendor/phpstan/phpstan/conf/bleedingEdge.neon'
+
+parameters:
+    level: max
+
+    # to allow installing with various phsptan versions without reporting old errors here
+    reportUnmatchedIgnoredErrors: false
+
+    paths:
+        - src
+        - tests
+
+    ignoreErrors:
+        - '#return type has no value type specified in iterable type array#'
+        - '#with no value type specified in iterable type array#'
+        - '#type specified in iterable type (array|iterable)#'

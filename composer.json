@@ -1,0 +1,67 @@
+{
+  "name": "gixx/worstpractice-aws-s3-adapter",
+  "type": "library",
+  "version": "1.0.0",
+  "description": "A simple adapter for the AWS S3 Client",
+  "homepage": "http://www.worstpractice.dev",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Gabor Ivan",
+      "email": "worst.practice.blog@gmail.com",
+      "homepage": "http://www.worstpractice.dev",
+      "role": "Developer"
+    }
+  ],
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.0"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "WorstPractice\\": "./src/WorstPractice"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WorstPracticeTest\\": "./tests/WorstPracticeTest"
+    }
+  },
+  "require": {
+    "php": ">=8.0",
+    "aws/aws-sdk-php": "^3.175"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "v2.18.4",
+    "phpmd/phpmd": "2.9.1",
+    "phpstan/phpstan": "0.12.82",
+    "phpunit/phpunit": "9.3.11",
+    "roave/security-advisories": "dev-master",
+    "squizlabs/php_codesniffer": "3.5.8",
+    "symplify/easy-coding-standard": "9.2.1",
+    "symplify/phpstan-extensions": "9.2.1",
+    "thecodingmachine/phpstan-strict-rules": "v0.12.1"
+  },
+  "scripts-descriptions": {
+    "check": "Run all tests!"
+  },
+  "scripts": {
+    "check": [
+      "@lint",
+      "@md",
+      "@cs-fixer",
+      "@cs",
+      "@unit",
+      "@phpstan"
+    ],
+    "lint": "find src/ -type f -name \"*.php\" | xargs -n1 php -l 2>/dev/null",
+    "md": "vendor/bin/phpmd src/ text phpmd.xml",
+    "cs-fixer": "vendor/bin/php-cs-fixer fix src/",
+    "cs": "vendor/bin/phpcs --standard=PSR12 src/",
+    "unit": "vendor/bin/phpunit -c phpunit.xml --testdox --colors=always",
+    "phpstan": "vendor/bin/phpstan analyse src --level=7"
+  }
+}

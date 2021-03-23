@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="false"
+        beStrictAboutTestsThatDoNotTestAnything="false"
+        beStrictAboutOutputDuringTests="true"
+        beStrictAboutChangesToGlobalState="true"
+        stopOnError="true"
+        stopOnWarning="true"
+        bootstrap="bootstrap.php"
+  >
+  <coverage>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <report>
+      <clover outputFile="build/clover.xml"/>
+      <html outputDirectory="build/coverage"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="all">
+      <directory suffix=".php">tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <const name="PHPUNIT_WORSTPRACTICE_TESTSUITE" value="true"/>
+  </php>
+  <logging/>
+</phpunit>

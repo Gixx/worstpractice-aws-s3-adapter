@@ -1,0 +1,10 @@
+version: "3.1"
+services:
+    php80:
+      image: adhocore/phpfpm:8.0
+      container_name: worstpractice-aws-s3-adapter
+      working_dir: /application
+      volumes:
+        - .:/application
+      env_file: config/dev.env
+      command: tail -f /dev/null
