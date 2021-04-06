@@ -136,11 +136,12 @@ class Adapter implements AdapterInterface
      *
      * @param array $fileList
      * @param string|null $sortBy
+     * @return bool
      */
-    protected function sortFileList(array &$fileList, ?string $sortBy): void
+    protected function sortFileList(array &$fileList, ?string $sortBy): bool
     {
         if (empty($fileList) || empty($sortBy) || !in_array($sortBy, $this->validSortByKeys, true)) {
-            return;
+            return false;
         }
 
         $direction = $sortBy[0] === '^' ? 'asc' : 'desc';
@@ -150,6 +151,8 @@ class Adapter implements AdapterInterface
             $cmp = strcmp($a[$sortByKey], $b[$sortByKey]);
             return $direction === 'asc' ? $cmp : -$cmp;
         });
+
+        return true;
     }
 
     /**
@@ -157,13 +160,16 @@ class Adapter implements AdapterInterface
      *
      * @param array $fileList
      * @param int $limit
+     * @return bool
      */
-    protected function limitFileList(array &$fileList, int $limit): void
+    protected function limitFileList(array &$fileList, int $limit): bool
     {
         if (empty($fileList) || $limit <= 0) {
-            return;
+            return false;
         }
 
         $fileList = array_chunk($fileList, $limit)[0];
+
+        return true;
     }
 }
