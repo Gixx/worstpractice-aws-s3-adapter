@@ -45,7 +45,7 @@ $s3Client = new S3Client([
 $s3Adapter = new Adapter($s3Client);
 $s3Adapter->setBucket('my-bucket');
 
-// The result will be the "key" (kind of absolute path + filename) of the file in the S3 bucket of NULL when no file
+// The result will be the "key" (kind of absolute path + filename) of the file in the S3 bucket or NULL when no file
 // found on the given "path".
 $latestFileInFolder = $s3Adapter->getLastUploadedKeyByPrefix('folder/subfolder');
 
