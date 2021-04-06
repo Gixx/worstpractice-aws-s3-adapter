@@ -77,6 +77,27 @@ class Adapter implements AdapterInterface
      */
     public function getObjectListByPrefix(string $keyPrefix, string $sortBy = null, int $limit = 0): array
     {
+        $options = $this->getSearchOptions($keyPrefix, $sortBy, $limit);
+
+        $results = $this->fetchFullFileList($options);
+        // Avoid sort if not needed.
+        $sortBy !== self::OBJECT_SORT_BY_NAME && $this->sortFileList($results, $sortBy);
+        // Avoid limit if not needed.
+        $limit && $this->limitFileList($results, $limit);
+
+        return $results;
+    }
+
+    /**
+     * Create the search options, and modify the sort and limit attributes if necessary.
+     *
+     * @param string $keyPrefix
+     * @param string|null $sortBy
+     * @param int $limit
+     * @return array
+     */
+    private function getSearchOptions(string $keyPrefix, ?string &$sortBy, int &$limit): array
+    {
         $options = [
             'Bucket' => $this->bucket,
             'EncodingType' => 'url',
@@ -84,22 +105,20 @@ class Adapter implements AdapterInterface
             'RequestPayer' => 'requester'
         ];
 
-        $defaultSort = empty($sortBy) || $sortBy === self::OBJECT_SORT_BY_NAME;
+        if (empty($sortBy)) {
+            $sortBy = self::OBJECT_SORT_BY_NAME;
+        }
+
+        $limit = (int) abs($limit);
 
         // We can add a query limit here only when we don't want any special sorting.
-        if ($defaultSort && $limit > 0 && $limit < self::AWS_DEFAULT_LIST_LIMIT) {
+        if ($sortBy === self::OBJECT_SORT_BY_NAME && $limit < self::AWS_DEFAULT_LIST_LIMIT) {
             $options['MaxKeys'] = $limit;
             // Set the parameter to 0 to avoid the unnecessary array_chunk later.
             $limit = 0;
         }
 
-        $results = $this->fetchFullFileList($options);
-        // Avoid sort if not needed.
-        !$defaultSort && $this->sortFileList($results, $sortBy);
-        // Avoid limit if not needed.
-        $limit && $this->limitFileList($results, $limit);
-
-        return $results;
+        return $options;
     }
 
     /**
@@ -108,7 +127,7 @@ class Adapter implements AdapterInterface
      * @param array $options
      * @return array
      */
-    protected function fetchFullFileList(array $options): array
+    private function fetchFullFileList(array $options): array
     {
         $results = [];
         $continuationToken = '';
@@ -138,7 +157,7 @@ class Adapter implements AdapterInterface
      * @param string|null $sortBy
      * @return bool
      */
-    protected function sortFileList(array &$fileList, ?string $sortBy): bool
+    private function sortFileList(array &$fileList, ?string $sortBy): bool
     {
         if (empty($fileList) || empty($sortBy) || !in_array($sortBy, $this->validSortByKeys, true)) {
             return false;
@@ -162,7 +181,7 @@ class Adapter implements AdapterInterface
      * @param int $limit
      * @return bool
      */
-    protected function limitFileList(array &$fileList, int $limit): bool
+    private function limitFileList(array &$fileList, int $limit): bool
     {
         if (empty($fileList) || $limit <= 0) {
             return false;

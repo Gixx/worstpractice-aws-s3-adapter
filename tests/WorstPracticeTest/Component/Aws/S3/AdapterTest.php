@@ -142,6 +142,15 @@ class AdapterTest extends PHPUnitTestCase
                     ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                 ],
             ],
+            'testMoreResultWithNegativeLimit' => [
+                'prefix' => 'three-results',
+                'sortBy' => null,
+                'limit' => -2,
+                'expectedResult' => [
+                    ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00'],
+                    ['Key' => 'one-result/data2.txt', 'LastModified' => '2020-03-05 10:00:00'],
+                ],
+            ],
             'testMoreResultWithSortByName' => [
                 'prefix' => 'three-results',
                 'sortBy' => S3Adapter::OBJECT_SORT_BY_NAME,
