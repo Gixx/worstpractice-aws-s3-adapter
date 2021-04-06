@@ -23,6 +23,9 @@ use WorstPractice\Component\Aws\S3\Adapter as S3Adapter;
 
 class AdapterTest extends PHPUnitTestCase
 {
+    /**
+     * By default the objects are returned sorted in an ascending order of the respective `Key` names in the list.
+     */
     public const S3_BUCKET = [
         'total-bad' => [
             '' => null
@@ -46,9 +49,9 @@ class AdapterTest extends PHPUnitTestCase
         'three-results' => [
             '' => [
                 'Contents' => [
-                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                     ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00'],
                     ['Key' => 'one-result/data2.txt', 'LastModified' => '2020-03-05 10:00:00'],
+                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                 ],
                 'NextContinuationToken' => '',
                 'IsTruncated' => false
@@ -57,27 +60,27 @@ class AdapterTest extends PHPUnitTestCase
         'paged-results' => [
             '' => [
                 'Contents' => [
-                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                     ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00'],
                     ['Key' => 'one-result/data2.txt', 'LastModified' => '2020-03-05 10:00:00'],
+                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                 ],
                 'NextContinuationToken' => 'abcde1234567890',
                 'IsTruncated' => true
             ],
             'abcde1234567890' => [
                 'Contents' => [
+                    ['Key' => 'one-result/data4.txt', 'LastModified' => '2020-03-07 10:00:00'],
                     ['Key' => 'one-result/data5.txt', 'LastModified' => '2020-03-04 11:00:00'],
                     ['Key' => 'one-result/data6.txt', 'LastModified' => '2020-03-05 18:00:00'],
-                    ['Key' => 'one-result/data7.txt', 'LastModified' => '2020-03-06 10:00:00'],
                 ],
                 'NextContinuationToken' => '1234567890abcde',
                 'IsTruncated' => true
             ],
             '1234567890abcde' => [
                 'Contents' => [
-                    ['Key' => 'one-result/data4.txt', 'LastModified' => '2020-03-07 10:00:00'],
-                    ['Key' => 'one-result/data9.txt', 'LastModified' => '2020-03-03 09:00:00'],
+                    ['Key' => 'one-result/data7.txt', 'LastModified' => '2020-03-06 10:00:00'],
                     ['Key' => 'one-result/data8.txt', 'LastModified' => '2020-03-08 10:00:00'],
+                    ['Key' => 'one-result/data9.txt', 'LastModified' => '2020-03-03 09:00:00'],
                 ],
                 'NextContinuationToken' => '',
                 'IsTruncated' => false
@@ -127,6 +130,16 @@ class AdapterTest extends PHPUnitTestCase
                 'limit' => 3,
                 'expectedResult' => [
                     ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00']
+                ],
+            ],
+            'testMoreResultWithInvalidSortBy' => [
+                'prefix' => 'three-results',
+                'sortBy' => 'invalid',
+                'limit' => 0,
+                'expectedResult' => [
+                    ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00'],
+                    ['Key' => 'one-result/data2.txt', 'LastModified' => '2020-03-05 10:00:00'],
+                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                 ],
             ],
             'testMoreResultWithSortByName' => [
@@ -202,8 +215,8 @@ class AdapterTest extends PHPUnitTestCase
                 'sortBy' => null,
                 'limit' => 2,
                 'expectedResult' => [
-                    ['Key' => 'one-result/data3.txt', 'LastModified' => '2020-03-04 10:00:00'],
                     ['Key' => 'one-result/data1.txt', 'LastModified' => '2020-03-03 10:00:00'],
+                    ['Key' => 'one-result/data2.txt', 'LastModified' => '2020-03-05 10:00:00'],
                 ],
             ]
         ];

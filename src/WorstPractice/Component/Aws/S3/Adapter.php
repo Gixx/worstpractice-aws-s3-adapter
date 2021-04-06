@@ -84,18 +84,20 @@ class Adapter implements AdapterInterface
             'RequestPayer' => 'requester'
         ];
 
+        $defaultSort = empty($sortBy) || $sortBy === self::OBJECT_SORT_BY_NAME;
+
         // We can add a query limit here only when we don't want any special sorting.
-        // The default chunk limit is 1000. Probably the guys at the AWS know why not recommended to go over this limit
-        // so I won't do either.
-        if (empty($sortBy) && $limit > 0 && $limit < self::AWS_DEFAULT_LIST_LIMIT) {
+        if ($defaultSort && $limit > 0 && $limit < self::AWS_DEFAULT_LIST_LIMIT) {
             $options['MaxKeys'] = $limit;
             // Set the parameter to 0 to avoid the unnecessary array_chunk later.
             $limit = 0;
         }
 
         $results = $this->fetchFullFileList($options);
-        $this->sortFileList($results, $sortBy);
-        $this->limitFileList($results, $limit);
+        // Avoid sort if not needed.
+        !$defaultSort && $this->sortFileList($results, $sortBy);
+        // Avoid limit if not needed.
+        $limit && $this->limitFileList($results, $limit);
 
         return $results;
     }
@@ -137,7 +139,7 @@ class Adapter implements AdapterInterface
      */
     protected function sortFileList(array &$fileList, ?string $sortBy): void
     {
-        if (empty($sortBy) || !in_array($sortBy, $this->validSortByKeys, true)) {
+        if (empty($fileList) || empty($sortBy) || !in_array($sortBy, $this->validSortByKeys, true)) {
             return;
         }
 
