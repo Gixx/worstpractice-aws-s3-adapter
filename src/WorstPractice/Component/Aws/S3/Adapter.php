@@ -166,12 +166,10 @@ class Adapter implements AdapterInterface
         $direction = $sortBy[0] === '^' ? 'asc' : 'desc';
         $sortByKey = substr($sortBy, 1);
 
-        usort($fileList, static function ($a, $b) use ($direction, $sortByKey) {
+        return usort($fileList, static function ($a, $b) use ($direction, $sortByKey) {
             $cmp = strcmp($a[$sortByKey], $b[$sortByKey]);
             return $direction === 'asc' ? $cmp : -$cmp;
         });
-
-        return true;
     }
 
     /**
